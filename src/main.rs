@@ -2,6 +2,12 @@ use eframe::egui::*;
 use std::borrow::Cow;
 use std::fmt::format;
 
+use eframe::egui::{self, Button, Color32, FontDefinitions, FontFamily, Hyperlink, Label, Layout, Separator, TopBottomPanel};
+
+pub const PADDING: f32 = 5.0;
+const WHITE: Color32 = Color32::from_rgb(255, 255, 255);
+const CYAN: Color32 = Color32::from_rgb(0, 255, 255);
+
 fn main() {
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
@@ -57,7 +63,32 @@ impl Samachar {
             articles: Vec::from_iter(iter),
         }
     }
+
+    fn render_news_cards(&self, ui: &mut eframe::egui::Ui){
+        for article in &self.articles {
+            // Render Title
+            ui.add_space(PADDING);
+            let title = format!("{}", article.title);
+            ui.colored_label(WHITE, title);
+
+            // Render Description
+            ui.add_space(PADDING);
+            let description = Label::new(&article.description);
+            ui.add(description);
+
+
+            // render hyperlinks
+            ui.style_mut().visuals.hyperlink_color = CYAN;
+            ui.add_space(PADDING);
+            ui.with_layout(Layout::right_to_left(egui::Align::TOP), |ui| {
+                ui.add(Hyperlink::from_label_and_url("read more.", &article.url));
+            });
+            ui.add_space(PADDING);
+            ui.add(Separator::default());
+        }
+    }
 }
+
 
 impl eframe::App for Samachar {
     fn update(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
@@ -65,12 +96,10 @@ impl eframe::App for Samachar {
             ui.heading("Samachar: The Headline");
 
             ScrollArea::auto_shrink(ScrollArea::new([true; 2]), [false; 2]).show(ui, |ui| {
-                for article in &self.articles {
-                    ui.label(&article.title);
-                    ui.label(&article.description);
-                    ui.label(&article.url);
-                }
+                self.render_news_cards(ui)
             })
         });
     }
+
+
 }
