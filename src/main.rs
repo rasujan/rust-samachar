@@ -3,12 +3,13 @@ mod headlines;
 use eframe::egui::panel::TopBottomSide::Top;
 use eframe::egui::{
     self, Button, CentralPanel, Color32, Context, FontDefinitions, FontFamily, Hyperlink, Label,
-    Layout, ScrollArea, Separator, TopBottomPanel,
+    Layout, ScrollArea, Separator, TopBottomPanel, Ui,
 };
 use headlines::{Samachar, PADDING};
 
 impl eframe::App for Samachar {
     fn update(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
+        self.render_top_panel(ctx);
         CentralPanel::default().show(ctx, |ui| {
             render_header(ui);
             ScrollArea::auto_shrink(ScrollArea::new([true; 2]), [false; 2])
@@ -18,7 +19,7 @@ impl eframe::App for Samachar {
     }
 }
 
-fn render_header(ui: &mut eframe::egui::Ui) {
+fn render_header(ui: &mut Ui) {
     ui.vertical_centered(|ui| ui.heading("Samachar"));
 
     ui.add_space(PADDING);
@@ -27,8 +28,8 @@ fn render_header(ui: &mut eframe::egui::Ui) {
 }
 
 fn render_footer(ctx: &Context) {
-    TopBottomPanel::bottom("footer").show(ctx, |ui: &mut eframe::egui::Ui| {
-        ui.vertical_centered(|ui: &mut eframe::egui::Ui| {
+    TopBottomPanel::bottom("footer").show(ctx, |ui: &mut Ui| {
+        ui.vertical_centered(|ui: &mut Ui| {
             ui.add_space(10.00);
             // source of the newsletter
             ui.add(Label::new(format!("API source: newsapi.org")));

@@ -1,12 +1,17 @@
+use eframe::egui::CursorIcon::Default;
+use eframe::egui::TextStyle::Body;
 use eframe::egui::*;
+use eframe::egui::{
+    self, Button, Color32, FontDefinitions, FontFamily, Hyperlink, Label, Layout, Separator,
+    TopBottomPanel,
+};
+use egui::menu::bar;
 use std::borrow::Cow;
 use std::fmt::format;
-use eframe::egui::{self, Button, Color32, FontDefinitions, FontFamily, Hyperlink, Label, Layout, Separator, TopBottomPanel};
 
 pub const PADDING: f32 = 5.0;
 const WHITE: Color32 = Color32::from_rgb(255, 255, 255);
 const CYAN: Color32 = Color32::from_rgb(0, 255, 255);
-
 
 pub struct Samachar {
     articles: Vec<NewsCardData>,
@@ -19,7 +24,7 @@ struct NewsCardData {
 }
 
 impl Samachar {
-   pub  fn new(cc: &eframe::CreationContext<'_>) -> Samachar {
+    pub fn new(cc: &eframe::CreationContext<'_>) -> Samachar {
         // Self::default();
 
         let iter = (0..20).map(|a| NewsCardData {
@@ -41,12 +46,9 @@ impl Samachar {
             ),
         );
 
-        font_def.families.insert(
-            FontFamily::Proportional,
-            vec![
-                "RobotoSlab".to_owned()
-            ],
-        );
+        font_def
+            .families
+            .insert(FontFamily::Proportional, vec!["RobotoSlab".to_owned()]);
 
         cc.egui_ctx.set_fonts(font_def);
         Samachar {
@@ -54,7 +56,7 @@ impl Samachar {
         }
     }
 
-   pub fn render_news_cards(&self, ui: &mut eframe::egui::Ui){
+    pub fn render_news_cards(&self, ui: &mut eframe::egui::Ui) {
         for article in &self.articles {
             // Render Title
             ui.add_space(PADDING);
@@ -66,15 +68,32 @@ impl Samachar {
             let description = Label::new(&article.description);
             ui.add(description);
 
-
             // render hyperlinks
             ui.style_mut().visuals.hyperlink_color = CYAN;
             ui.add_space(PADDING);
-            ui.with_layout(Layout::right_to_left(egui::Align::TOP), |ui| {
+            ui.with_layout(Layout::right_to_left(Align::TOP), |ui| {
                 ui.add(Hyperlink::from_label_and_url("read more.", &article.url));
             });
             ui.add_space(PADDING);
             ui.add(Separator::default());
         }
+    }
+
+    pub(crate) fn render_top_panel(&self, ctx: &Context) {
+        // Define the top panel
+        TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
+            bar(ui, |ui: &mut Ui| {
+                // logo
+                ui.with_layout(Layout::left_to_right(Align::Center), |ui: &mut Ui| {
+                    ui.add(Label::new(format!("S")));
+                });
+                // Container
+                ui.with_layout(Layout::right_to_left(Align::Center), |ui: &mut Ui| {
+                    let close_button = ui.add(Button::new("❌"));
+                    let refers_button = ui.add(Button::new("🔁"));
+                    let theme_button = ui.add(Button::new("🌙"));
+                })
+            })
+        });
     }
 }
