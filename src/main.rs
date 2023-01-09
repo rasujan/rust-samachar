@@ -3,13 +3,20 @@ mod headlines;
 use eframe::egui::panel::TopBottomSide::Top;
 use eframe::egui::{
     self, Button, CentralPanel, Color32, Context, FontDefinitions, FontFamily, Hyperlink, Label,
-    Layout, ScrollArea, Separator, TopBottomPanel, Ui,
+    Layout, ScrollArea, Separator, TopBottomPanel, Ui, Visuals,
 };
 use headlines::{Samachar, PADDING};
 
 impl eframe::App for Samachar {
     fn update(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
-        self.render_top_panel(ctx);
+        if (self.config.dark_mode == true) {
+            ctx.set_visuals(Visuals::dark())
+        } else {
+            ctx.set_visuals(Visuals::light())
+        }
+
+        self.render_top_panel(ctx, frame);
+
         CentralPanel::default().show(ctx, |ui| {
             render_header(ui);
             ScrollArea::auto_shrink(ScrollArea::new([true; 2]), [false; 2])

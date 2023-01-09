@@ -13,14 +13,25 @@ pub const PADDING: f32 = 5.0;
 const WHITE: Color32 = Color32::from_rgb(255, 255, 255);
 const CYAN: Color32 = Color32::from_rgb(0, 255, 255);
 
+pub struct HeadlinesConfig {
+    pub dark_mode: bool,
+}
+
 pub struct Samachar {
     articles: Vec<NewsCardData>,
+    pub config: HeadlinesConfig,
 }
 
 struct NewsCardData {
     title: String,
     description: String,
     url: String,
+}
+
+impl HeadlinesConfig {
+    fn new() -> Self {
+        Self { dark_mode: true }
+    }
 }
 
 impl Samachar {
@@ -53,6 +64,7 @@ impl Samachar {
         cc.egui_ctx.set_fonts(font_def);
         Samachar {
             articles: Vec::from_iter(iter),
+            config: HeadlinesConfig::new(),
         }
     }
 
@@ -79,7 +91,7 @@ impl Samachar {
         }
     }
 
-    pub(crate) fn render_top_panel(&self, ctx: &Context) {
+    pub(crate) fn render_top_panel(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
         // Define the top panel
         TopBottomPanel::top("top_panel").show(ctx, |ui: &mut Ui| {
             bar(ui, |ui: &mut Ui| {
@@ -89,9 +101,17 @@ impl Samachar {
                 });
                 // Container
                 ui.with_layout(Layout::right_to_left(Align::Center), |ui: &mut Ui| {
-                    let close_button = ui.add(Button::new("❌"));
-                    let refers_button = ui.add(Button::new("🔁"));
-                    let theme_button = ui.add(Button::new("🌙"));
+                    let close_button = ui.add(Button::new("Close")); // ICons are not currently working
+                    let refers_button = ui.add(Button::new("Render"));
+                    let theme_button = ui.add(Button::new("Theme"));
+
+                    if theme_button.clicked() {
+                        self.config.dark_mode = !self.config.dark_mode;
+                    }
+
+                    if (close_button.clicked()) {
+                        frame.quit();
+                    }
                 })
             })
         });
