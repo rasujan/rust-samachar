@@ -11,7 +11,9 @@ use std::fmt::format;
 
 pub const PADDING: f32 = 5.0;
 const WHITE: Color32 = Color32::from_rgb(255, 255, 255);
-const CYAN: Color32 = Color32::from_rgb(0, 255, 255);
+const BLACK: Color32 = Color32::from_rgb(10, 10, 10);
+const CYAN: Color32 = Color32::from_rgb(100, 150, 150);
+const RED: Color32 = Color32::from_rgb(180, 0, 0);
 
 pub struct HeadlinesConfig {
     pub dark_mode: bool,
@@ -73,7 +75,12 @@ impl Samachar {
             // Render Title
             ui.add_space(PADDING);
             let title = format!("{}", article.title);
-            ui.colored_label(WHITE, title);
+
+            if self.config.dark_mode {
+                ui.colored_label(WHITE, title);
+            } else {
+                ui.colored_label(BLACK, title);
+            }
 
             // Render Description
             ui.add_space(PADDING);
@@ -81,7 +88,12 @@ impl Samachar {
             ui.add(description);
 
             // render hyperlinks
-            ui.style_mut().visuals.hyperlink_color = CYAN;
+            if self.config.dark_mode {
+                ui.style_mut().visuals.hyperlink_color = CYAN;
+            } else {
+                ui.style_mut().visuals.hyperlink_color = RED;
+            }
+
             ui.add_space(PADDING);
             ui.with_layout(Layout::right_to_left(Align::TOP), |ui| {
                 ui.add(Hyperlink::from_label_and_url("read more.", &article.url));
