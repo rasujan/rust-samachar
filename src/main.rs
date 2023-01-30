@@ -9,13 +9,15 @@ use headlines::{Samachar, PADDING};
 
 impl eframe::App for Samachar {
     fn update(&mut self, ctx: &Context, frame: &mut eframe::Frame) {
-        if (self.config.dark_mode == true) {
+        if self.config.dark_mode == true {
             ctx.set_visuals(Visuals::dark())
         } else {
             ctx.set_visuals(Visuals::light())
         }
 
         self.render_top_panel(ctx, frame);
+
+        self.render_config(ctx);
 
         CentralPanel::default().show(ctx, |ui| {
             render_header(ui);
@@ -48,6 +50,7 @@ fn render_footer(ctx: &Context) {
 }
 
 fn main() {
+    tracing_subscriber::fmt::init();
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
         "Samachar",

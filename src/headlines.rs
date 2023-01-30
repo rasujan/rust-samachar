@@ -1,13 +1,14 @@
-use eframe::egui::CursorIcon::Default;
-use eframe::egui::TextStyle::Body;
+// use eframe::egui::CursorIcon::Default;
+// use eframe::egui::TextStyle::Body;
 use eframe::egui::*;
 use eframe::egui::{
     self, Button, Color32, FontDefinitions, FontFamily, Hyperlink, Label, Layout, Separator,
-    TopBottomPanel,
+    TopBottomPanel, Window,
 };
 use egui::menu::bar;
-use std::borrow::Cow;
-use std::fmt::format;
+use serde::{Deserialize, Serialize};
+// use std::borrow::Cow;
+// use std::fmt::format;
 
 pub const PADDING: f32 = 5.0;
 const WHITE: Color32 = Color32::from_rgb(255, 255, 255);
@@ -15,8 +16,11 @@ const BLACK: Color32 = Color32::from_rgb(10, 10, 10);
 const CYAN: Color32 = Color32::from_rgb(100, 150, 150);
 const RED: Color32 = Color32::from_rgb(180, 0, 0);
 
+#[derive(Serialize, Deserialize)]
+
 pub struct HeadlinesConfig {
     pub dark_mode: bool,
+    pub api_key: String,
 }
 
 pub struct Samachar {
@@ -30,9 +34,12 @@ struct NewsCardData {
     url: String,
 }
 
-impl HeadlinesConfig {
-    fn new() -> Self {
-        Self { dark_mode: true }
+impl Default for HeadlinesConfig {
+    fn default() -> Self {
+        Self {
+            dark_mode: Default::default(),
+            api_key: String::new(),
+        }
     }
 }
 
@@ -64,9 +71,12 @@ impl Samachar {
             .insert(FontFamily::Proportional, vec!["RobotoSlab".to_owned()]);
 
         cc.egui_ctx.set_fonts(font_def);
+
+        let config: HeadlinesConfig =
+            confy::load("headlines", "headlines-config").unwrap_or_default();
         Samachar {
             articles: Vec::from_iter(iter),
-            config: HeadlinesConfig::new(),
+            config,
         }
     }
 
@@ -121,11 +131,20 @@ impl Samachar {
                         self.config.dark_mode = !self.config.dark_mode;
                     }
 
-                    if (close_button.clicked()) {
+                    if close_button.clicked() {
                         frame.quit();
                     }
                 })
             })
+        });
+    }
+
+    pub fn render_config(&mut self, ctx: &Context) {
+        Window::new("Configuration").show(ctx, |ui| {
+            ui.label("Enter you API_KEY for newsapi.org");
+            let text_input = ui.text_edit_singleline(&mut self.config.api_key);
+            ui.label("If you don't have the API key, head over to ");
+            ui.hyperlink("https://newsapi.org");
         });
     }
 }
