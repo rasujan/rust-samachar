@@ -124,7 +124,7 @@ impl Samachar {
                 // Container
                 ui.with_layout(Layout::right_to_left(Align::Center), |ui: &mut Ui| {
                     let close_button = ui.add(Button::new("Close")); // ICons are not currently working
-                    let refers_button = ui.add(Button::new("Render"));
+                                                                     // let refers_button = ui.add(Button::new("Render"));
                     let theme_button = ui.add(Button::new("Theme"));
 
                     if theme_button.clicked() {
@@ -132,7 +132,7 @@ impl Samachar {
                     }
 
                     if close_button.clicked() {
-                        frame.quit();
+                        frame.close();
                     }
                 })
             })
@@ -143,6 +143,21 @@ impl Samachar {
         Window::new("Configuration").show(ctx, |ui| {
             ui.label("Enter you API_KEY for newsapi.org");
             let text_input = ui.text_edit_singleline(&mut self.config.api_key);
+            if text_input.lost_focus() && ui.input().key_pressed(egui::Key::Enter) {
+                if let Err(e) = confy::store(
+                    "headlines",
+                    "headlines",
+                    HeadlinesConfig {
+                        dark_mode: self.config.dark_mode,
+                        api_key: self.config.api_key.to_string(),
+                    },
+                ) {
+                    tracing::error!("Failed to save app state: {}", e)
+                };
+                tracing::error!("API key set")
+            }
+
+            // tracing::error!("{}", &self.config.api_key);
             ui.label("If you don't have the API key, head over to ");
             ui.hyperlink("https://newsapi.org");
         });
